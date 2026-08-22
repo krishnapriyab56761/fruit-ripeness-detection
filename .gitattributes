@@ -1,0 +1,16 @@
+# Ignore dataset
+dataset/
+
+# Python cache and environments
+__pycache__/
+*.pyc
+venv/
+.env/
+
+# IDE configs
+.vscode/
+.idea/
+
+# Model files
+*.h5
+*.keras

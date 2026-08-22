@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fruit Ripeness Detection</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, #dfffe5, transparent 35%),
+                radial-gradient(circle at bottom right, #d9e8ff, transparent 35%),
+                linear-gradient(135deg, #f7fff9, #eef5ff);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #17202a;
+        }
+
+        /* ---------------- HEADER ---------------- */
+
+        .header {
+            width: 100%;
+            padding: 28px 20px 15px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 42px;
+            margin-bottom: 5px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        /* ---------------- MAIN CARD ---------------- */
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            padding: 15px 20px 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(15px);
+
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 20px 50px rgba(30, 60, 90, 0.15);
+
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        /* ---------------- FILE UPLOAD ---------------- */
+
+        .upload-box {
+            border: 2px dashed #b8c8d8;
+            border-radius: 18px;
+            padding: 25px;
+            background: #f8fbff;
+            transition: 0.3s;
+        }
+
+        .upload-box:hover {
+            border-color: #2563eb;
+            background: #f1f7ff;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 18px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            max-width: 380px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* ---------------- IMAGE PREVIEW ---------------- */
+
+        #preview {
+            display: none;
+
+            width: 300px;
+            height: 300px;
+
+            object-fit: contain;
+
+            margin: 25px auto;
+
+            border-radius: 20px;
+
+            background: #f1f5f9;
+
+            border: 1px solid #dbe4ec;
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        /* ---------------- BUTTON ---------------- */
+
+        #predictBtn {
+            border: none;
+
+            padding: 14px 35px;
+
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                #16a34a,
+                #059669
+            );
+
+            color: white;
+
+            font-size: 16px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 18px rgba(22, 163, 74, 0.25);
+
+            transition: all 0.25s ease;
+        }
+
+        #predictBtn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 25px rgba(22, 163, 74, 0.35);
+        }
+
+        #predictBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ---------------- LOADING ---------------- */
+
+        #loading {
+            display: none;
+
+            margin-top: 20px;
+
+            color: #2563eb;
+
+            font-weight: 600;
+        }
+
+        /* ---------------- RESULT ---------------- */
+
+        #result {
+            display: block;
+
+            margin-top: 30px;
+
+            padding: 25px;
+
+            border-radius: 20px;
+
+            background: linear-gradient(
+                135deg,
+                #f0fdf4,
+                #eff6ff
+            );
+
+            border: 1px solid #dbeafe;
+
+            min-height: 130px;
+        }
+
+        #result h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #334155;
+        }
+
+        #fruit {
+            font-size: 23px;
+            line-height: 1.7;
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        #confidence {
+            font-size: 18px;
+            color: #334155;
+        }
+
+        /* ---------------- SPEAK BUTTON ---------------- */
+
+        #speakBtn {
+            margin-top: 18px;
+
+            padding: 10px 24px;
+
+            border-radius: 10px;
+
+            border: 1px solid #cbd5e1;
+
+            background: white;
+
+            color: #334155;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        #speakBtn:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        /* ---------------- FOOTER ---------------- */
+
+        footer {
+            width: 100%;
+            text-align: center;
+
+            padding: 20px;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+        footer strong {
+            color: #334155;
+        }
+
+        /* ---------------- MOBILE ---------------- */
+
+        @media (max-width: 600px) {
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .card {
+                padding: 25px 18px;
+                border-radius: 22px;
+            }
+
+            #preview {
+                width: 240px;
+                height: 240px;
+            }
+
+            .upload-box {
+                padding: 20px 12px;
+            }
+
+            #fruit {
+                font-size: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="logo">
+           
+        </div>
+
+        <h1>
+            Fruit Ripeness Detection
+        </h1>
+
+        <p>
+            AI-powered fruit freshness classification
+        </p>
+
+    </header>
+
+
+
+    <!-- MAIN -->
+
+    <div class="container">
+
+        <div class="card">
+
+
+            <h2 class="card-title">
+                 Check Your Fruit
+            </h2>
+
+            <p class="card-subtitle">
+                Upload a fruit image and let AI identify its freshness.
+            </p>
+
+
+            <!-- UPLOAD -->
+
+            <div class="upload-box">
+
+                <div class="upload-icon">
+                    📷
+                </div>
+
+                <div class="upload-text">
+                    Upload Fruit Image
+                </div>
+
+                <div class="upload-hint">
+                    JPG, JPEG or PNG images
+                </div>
+
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                >
+
+            </div>
+
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <img
+                id="preview"
+                src=""
+                alt="Image Preview"
+            >
+
+
+
+            <!-- PREDICT BUTTON -->
+
+            <button
+                id="predictBtn"
+                type="button"
+            >
+                🔍 Check Ripeness
+            </button>
+
+
+
+            <!-- LOADING -->
+
+            <div id="loading">
+
+                🔄 Analyzing your fruit...
+
+            </div>
+
+
+
+            <!-- RESULT -->
+
+            <div id="result">
+
+                <h2>
+                    Prediction Result
+                </h2>
+
+
+                <h3 id="fruit"></h3>
+
+
+                <h3 id="confidence"></h3>
+
+
+                <button
+                    id="speakBtn"
+                    type="button"
+                >
+                    🔊 Speak
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+             AI-powered insights for smarter food choices.
+        </p>
+
+        <p>
+            <strong>
+                © 2026 Fruit Ripeness Detection
+            </strong>
+            | Innovation in every bite
+        </p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
